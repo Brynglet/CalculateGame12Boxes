@@ -1,4 +1,3 @@
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -14,12 +13,12 @@ import java.util.Random;
  * 8 GB RAM
  *
  * 	***Simulation***
- *	Time: 2692 ms
- *	Expected result simulation: €73.0
+ *	Time: 2822 ms
+ *	Expected result simulation: €73.530328
  *
  * 	***Calculation***
- *	Time: 3824 ms
- *	Expected result calculation: €72,8
+ *	Time: 8444 ms
+ *	Expected result calculation: €73.54166658882862
  *
  */
 public class Game {
@@ -30,7 +29,7 @@ public class Game {
 	private static final int NUMBER_OF_GAMES = 10000000;
 	private static final boolean IGNORE_GAME_OVER_FALSE = false;
 	private static final boolean IGNORE_GAME_OVER_TRUE = true;
-	private static long totalEarningsSimulated = 0;
+	private static double totalEarningsSimulated = 0;
 
 	private static final int BONUS_ARRAY_LENGTH_ROUND_1 = 4;
 	private static final int BONUS_ARRAY_LENGTH_ROUND_2 = 3;
@@ -50,16 +49,20 @@ public class Game {
 	 */
 	public static void main(String[] args) {
 
-		/* Simulate solution */
+		/* Simulate solution start */
 		final long startTimeSimulation = System.currentTimeMillis();
 		for (int i = 0; i < NUMBER_OF_GAMES; i++) {
 			totalEarningsSimulated += playGame(FIRST_ROUND, INITIAL_GAME_EARNINGS_ZERO);
 		}
+
 		final double expectedResultSimulation = (totalEarningsSimulated / NUMBER_OF_GAMES);
 		final long endTimeSimulation = System.currentTimeMillis();
+		/* Simulate solution end  */
 
+		/* Calculate solution start */
 		calculateExpectedResult(initializeGameBoxes(), FIRST_ROUND, IGNORE_GAME_OVER_FALSE, 1.0000);
 		final long endTimeCalculation = System.currentTimeMillis();
+		/* Calculate solution end */
 
 		/* Print solutions */
 		System.out.println("***Simulation***");
@@ -68,9 +71,12 @@ public class Game {
 		System.out.println();
 		System.out.println("***Calculation***");
 		System.out.println("Time: " + (endTimeCalculation - endTimeSimulation) + " ms");
+
+		System.out.println("Expected result calculation: €" + expectedResultCalculated);
+
 		/* Round for presentation */
-		DecimalFormat df = new DecimalFormat("#.#");
-		System.out.println("Expected result calculation: €" + df.format(expectedResultCalculated));
+//		DecimalFormat df = new DecimalFormat("#.#");
+//		System.out.println("Expected result calculation: €" + df.format(expectedResultCalculated));
 		System.out.println();
 	}
 
@@ -97,7 +103,7 @@ public class Game {
 
 			if (box.getValue() != null) {
 				/* Value box */
-				expectedResultCalculated += probabilityOpenedThisBox * box.getValue().intValue();
+				expectedResultCalculated += (probabilityOpenedThisBox * box.getValue().intValue());
 				calculateExpectedResult(remainingBoxes, round, ignoreGameOver, probabilityOpenedThisBox);
 			} else if (box.getExtraLife() == true) {
 				/* Extra life box, nullify next game over box. */
@@ -109,13 +115,13 @@ public class Game {
 				} else {
 					if (round == 1) {
 						/* First round */
-						expectedResultCalculated += probabilityOpenedThisBox / BONUS_ARRAY_LENGTH_ROUND_1 * (20 + 10 + 5);
-						calculateExpectedResult(remainingBoxes, SECOND_ROUND, IGNORE_GAME_OVER_FALSE, probabilityOpenedThisBox / 4.0);
+						expectedResultCalculated += ((20 + 10 + 5) * (probabilityOpenedThisBox / BONUS_ARRAY_LENGTH_ROUND_1));
+						calculateExpectedResult(remainingBoxes, SECOND_ROUND, IGNORE_GAME_OVER_FALSE, (probabilityOpenedThisBox / 4.0));
 					} else {
 						/* Second round */
-						expectedResultCalculated += probabilityOpenedThisBox / BONUS_ARRAY_LENGTH_ROUND_2 * (20 + 10 + 5);
+						expectedResultCalculated += ((20 + 10 + 5) * (probabilityOpenedThisBox / BONUS_ARRAY_LENGTH_ROUND_2));
 						// True game over
-						return;
+						//return; comment out for best result.
 					}
 				}
 			}
